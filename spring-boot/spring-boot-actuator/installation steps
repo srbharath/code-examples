@@ -1,0 +1,65 @@
+To install helm 
+
+==================================================================
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+==================================================================
+ Add the repo 
+
+ helm repo add stable https://charts.helm.sh/stable
+helm repo update
+helm install kube-state-helm stable/kube-state-metrics
+
+kubectl get all
+kubectl edit service/kube-state-helm-kube-state-metrics  
+(edit type : ClusterIp  --> NodePort)
+nodePort: 31000
+================================================================
+To Deploy NodePorter  
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install my-release prometheus-community/prometheus-node-exporter
+
+kubectl edit service/my-release-prometheus-node-exporter
+
+nodePort: 31300
+
+=================================================================
+Now we can deploy spring boot application
+
+git clone https://github.com/srbharath/code-examples/tree/master/spring-boot/spring-boot-actuator
+
+kubectl apply -f spring-dep-svc.yml
+
+----------------------------------------------------------------------------------------------------------------------------
+
+lets apply hpa for this application for that we need to deploy metrics server
+
+wget -O metricserver.yml https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+--kubelet-insecure-tls
+
+kubectl autoscale deployment spring-svc-deployment --cpu-percent=20 --min=1 --max=10
+
+================================================================
+
+add this in prometheus conf file
+
+
+- job_name: 'kube-state-metrics'
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+     - targets: ["13.230.143.42:31000"]
+
+  - job_name: 'node-exporter'
+    metrics_path: '/metrics'
+    static_configs:
+     - targets: ["13.230.143.42:31300"]
+
+
+
+
+
