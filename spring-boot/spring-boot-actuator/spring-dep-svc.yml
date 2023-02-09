@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-service
+  labels:
+    app: spring-service
+spec:
+  ports:
+    - name: http
+      port: 9003
+      targetPort: 9003
+      nodePort: 32110
+  selector:
+    app: spring
+  type: NodePort
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-svc-deployment
+spec:
+  selector:
+    matchLabels:
+      app: spring
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spring
+    spec:
+      containers:
+      - name: springservice
+        image: bharath5565/spring1
+        ports:
+        - containerPort: 9003
