@@ -59,7 +59,7 @@ add this in prometheus conf file
     static_configs:
      - targets: ["13.230.143.42:31300"]
 
-
+metrics reference : https://github.com/kubernetes/kube-state-metrics/tree/main/docs
 
 
 
